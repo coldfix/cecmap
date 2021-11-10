@@ -2,7 +2,8 @@ import cec
 
 import os
 import signal
-from subprocess import run
+import subprocess
+from functools import partial
 
 
 class Keycode:
@@ -23,16 +24,42 @@ class Keycode:
     Pause = 70
 
 
+def Run(*args, **kwargs):
+    return partial(subprocess.Popen, [args], **kwargs)
+
+
+def Xdo(*args):
+    return Run(["xdotool"] + [str(arg) for arg in args])
+
+
+KEYBINDINGS = {
+    Keycode.Up:      Xdo("key", "Up"),
+    Keycode.Down:    Xdo("key", "Down"),
+    Keycode.Left:    Xdo("key", "Left"),
+    Keycode.Right:   Xdo("key", "Right"),
+    Keycode.Ok:      Xdo("key", "Return"),
+    Keycode.Back:    Xdo("key", "Escape"),
+    Keycode.Red:     Xdo("key", "Super_L"),
+    Keycode.Green:   Run("kodi"),
+    Keycode.Blue:    Run("chromium-browser"),
+    Keycode.Yellow:  Run("shutdown", "-h", "now"),
+}
+
+
 def main():
     print("Initializing...")
     os.environ.setdefault('DISPLAY', ':0')
     client = Client()
+    client.keybindings = KEYBINDINGS
     client.connect()
     print("Ready")
     signal.pause()
 
 
 class Client:
+
+    def __init__(self):
+        self.keybindings = {}
 
     def connect(self):
         cec.init()
@@ -41,32 +68,9 @@ class Client:
 
     def on_keypress(self, event, keycode, duration):
         if duration != 0:
-            if keycode == Keycode.Up:
-                xdo("key", "Up")
-            elif keycode == Keycode.Down:
-                xdo("key", "Down")
-            elif keycode == Keycode.Left:
-                xdo("key", "Left")
-            elif keycode == Keycode.Right:
-                xdo("key", "Right")
-
-            elif keycode == Keycode.Ok:
-                xdo("key", "Return")
-            elif keycode == Keycode.Back:
-                xdo("key", "Escape")
-
-            elif keycode == Keycode.Red:
-                xdo("key", "Super_L")
-            elif keycode == Keycode.Green:
-                run(["kodi"])
-            elif keycode == Keycode.Blue:
-                run(["chromium-browser"])
-            elif keycode == Keycode.Yellow:
-                run(["shutdown", "-h", "now"])
-
-
-def xdo(*args):
-    run(["xdotool"] + [str(arg) for arg in args])
+            action = self.keybindings.get(keycode)
+            if action:
+                action()
 
 
 if __name__ == '__main__':
