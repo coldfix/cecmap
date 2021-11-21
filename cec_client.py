@@ -3,7 +3,6 @@ import cec
 import os
 import signal
 import subprocess
-from functools import partial
 from enum import Enum
 
 
@@ -34,40 +33,40 @@ class Keycode(Enum):
     Pause = 70
 
 
-def Run(*args, **kwargs):
-    return partial(subprocess.Popen, [args], **kwargs)
+def run(*args, **kwargs):
+    return subprocess.Popen(args, **kwargs)
 
 
-def Xdo(*args):
-    return Run(["xdotool"] + [str(arg) for arg in args])
+def xdo(*args):
+    return run("xdotool", *[str(arg) for arg in args])
 
 
 KEYBINDINGS = {
     (Mode.Keyboard, Event.KeyDown): {
-        Keycode.Up:     Xdo("keydown", "Up"),
-        Keycode.Down:   Xdo("keydown", "Down"),
-        Keycode.Left:   Xdo("keydown", "Left"),
-        Keycode.Right:  Xdo("keydown", "Right"),
-        Keycode.Ok:     Xdo("keydown", "Return"),
-        Keycode.Play:   Xdo("keydown", "XF86AudioPlay"),
-        Keycode.Pause:  Xdo("keydown", "XF86AudioPause"),
-        Keycode.Back:   Xdo("keydown", "Escape"),
-        Keycode.Red:    Xdo("keydown", "Super_L"),
-        Keycode.Green:  Run("kodi"),
-        Keycode.Blue:   Run("chromium-browser"),
+        Keycode.Up:     (xdo, "keydown", "Up"),
+        Keycode.Down:   (xdo, "keydown", "Down"),
+        Keycode.Left:   (xdo, "keydown", "Left"),
+        Keycode.Right:  (xdo, "keydown", "Right"),
+        Keycode.Ok:     (xdo, "keydown", "Return"),
+        Keycode.Play:   (xdo, "keydown", "XF86AudioPlay"),
+        Keycode.Pause:  (xdo, "keydown", "XF86AudioPause"),
+        Keycode.Back:   (xdo, "keydown", "Escape"),
+        Keycode.Red:    (xdo, "keydown", "Super_L"),
+        Keycode.Green:  (run, "kodi"),
+        Keycode.Blue:   (run, "chromium-browser"),
     },
     (Mode.Keyboard, Event.KeyUp): {
-        Keycode.Up:     Xdo("keyup", "Up"),
-        Keycode.Down:   Xdo("keyup", "Down"),
-        Keycode.Left:   Xdo("keyup", "Left"),
-        Keycode.Right:  Xdo("keyup", "Right"),
-        Keycode.Ok:     Xdo("keyup", "Return"),
-        Keycode.Play:   Xdo("keyup", "XF86AudioPlay"),
-        Keycode.Pause:  Xdo("keyup", "XF86AudioPause"),
-        Keycode.Back:   Xdo("keyup", "Escape"),
-        Keycode.Red:    Xdo("keyup", "Super_L"),
-        # Keycode.Green:  Run("kodi"),
-        # Keycode.Blue:   Run("chromium-browser"),
+        Keycode.Up:     (xdo, "keyup", "Up"),
+        Keycode.Down:   (xdo, "keyup", "Down"),
+        Keycode.Left:   (xdo, "keyup", "Left"),
+        Keycode.Right:  (xdo, "keyup", "Right"),
+        Keycode.Ok:     (xdo, "keyup", "Return"),
+        Keycode.Play:   (xdo, "keyup", "XF86AudioPlay"),
+        Keycode.Pause:  (xdo, "keyup", "XF86AudioPause"),
+        Keycode.Back:   (xdo, "keyup", "Escape"),
+        Keycode.Red:    (xdo, "keyup", "Super_L"),
+        # Keycode.Green:  (run, "kodi"),
+        # Keycode.Blue:   (run, "chromium-browser"),
     },
 }
 
@@ -105,10 +104,8 @@ def make_keybindings(on, action):
             for x in action.items()
             for x_cond, x_do in make_keybindings(*x)
         ]
-    elif callable(action):
-        return [(cond, action)]
     else:
-        raise TypeError(type(action))
+        return [(cond, action)]
 
 
 def main():
@@ -127,7 +124,7 @@ class Client:
         self.keybindings = []
         self.num_modes = num_modes
         self.mode = 0
-        self.bind({(Keycode.Yellow, Event.KeyDown): self.switch_mode})
+        self.bind({(Keycode.Yellow, Event.KeyDown): [self.switch_mode]})
 
     def bind(self, rules):
         self.keybindings.extend(make_keybindings((), rules))
@@ -147,7 +144,8 @@ class Client:
         event = (Event.KeyDown if duration == 0 else Event.KeyUp).value
         for on, action in self.keybindings:
             if on.check(keycode=keycode, mode=mode, event=event):
-                action()
+                func, *args = action
+                func(*args)
                 break
 
 
