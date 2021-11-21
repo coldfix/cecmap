@@ -1,13 +1,15 @@
 import cec
 
 import os
-import signal
 import subprocess
+import time
 from enum import Enum
+from queue import Queue, Empty
 
 
 class Mode(Enum):
-    Keyboard = 0
+    Mouse = 0
+    Keyboard = 1
 
 
 class Event(Enum):
@@ -31,6 +33,14 @@ class Keycode(Enum):
 
     Play = 68
     Pause = 70
+
+
+class Button:
+    Left = 1
+    Middle = 2
+    Right = 3
+    WheelUp = 4
+    WheelDown = 5
 
 
 def run(*args, **kwargs):
@@ -87,6 +97,37 @@ class Condition:
         ])
 
 
+class Cursor:
+
+    def __init__(self):
+        self.active = set()
+        self.dx = {Keycode.Left: -1, Keycode.Right: 1}
+        self.dy = {Keycode.Up: -1, Keycode.Down: 1}
+        self.pos0 = (0, 0)
+        self.pos1 = self.pos0
+
+    def move(self, key):
+        self.active.add(key)
+
+    def stop(self, key):
+        self.active.remove(key)
+
+    def dispatch(self, delta):
+        if self.active:
+            dx = sum([self.dx.get(key, 0) for key in self.active])
+            dy = sum([self.dy.get(key, 0) for key in self.active])
+            x0, y0 = self.pos0
+            x1, y1 = self.pos1
+            x1 += dx * delta
+            y1 += dy * delta
+            x2 = round(x1)
+            y2 = round(y1)
+            self.pos0 = (x2, y2)
+            self.pos1 = (x1, y1)
+            if x2 != x0 or y2 != y0:
+                xdo("mousemove_relative", "--", x2 - x0, y2 - y0)
+
+
 def make_condition(on):
     if not isinstance(on, (tuple, list)):
         on = [on]
@@ -108,14 +149,67 @@ def make_keybindings(on, action):
         return [(cond, action)]
 
 
+class Clock:
+
+    def __init__(self):
+        self.prev = time.perf_counter()
+
+    def __call__(self):
+        now = time.perf_counter()
+        delta = now - self.prev
+        self.prev = now
+        return delta
+
+
 def main():
     print("Initializing...")
     os.environ.setdefault('DISPLAY', ':0')
+
+    timestep = 0.01
+    mouse_speed = 200
+
+    cursor = Cursor()
     client = Client(num_modes=len(Mode.__members__))
     client.bind(KEYBINDINGS)
+    client.bind({
+        (Mode.Mouse, Event.KeyDown): {
+            Keycode.Up:     (cursor.move, Keycode.Up),
+            Keycode.Down:   (cursor.move, Keycode.Down),
+            Keycode.Left:   (cursor.move, Keycode.Left),
+            Keycode.Right:  (cursor.move, Keycode.Right),
+            Keycode.Ok:     (xdo, "mousedown", Button.Left),
+            Keycode.Play:   (xdo, "mousedown", Button.Middle),
+            Keycode.Pause:  (xdo, "mousedown", Button.Right),
+            Keycode.Back:   (xdo, "keydown", "Escape"),
+            Keycode.Red:    (xdo, "keydown", "Super_L"),
+            Keycode.Green:  (xdo, "click", Button.WheelUp),
+            Keycode.Blue:   (xdo, "click", Button.WheelDown),
+        },
+        (Mode.Mouse, Event.KeyUp): {
+            Keycode.Up:     (cursor.stop, Keycode.Up),
+            Keycode.Down:   (cursor.stop, Keycode.Down),
+            Keycode.Left:   (cursor.stop, Keycode.Left),
+            Keycode.Right:  (cursor.stop, Keycode.Right),
+            Keycode.Ok:     (xdo, "mouseup", Button.Left),
+            Keycode.Play:   (xdo, "mouseup", Button.Middle),
+            Keycode.Pause:  (xdo, "mouseup", Button.Right),
+            Keycode.Back:   (xdo, "keyup", "Escape"),
+            Keycode.Red:    (xdo, "keyup", "Super_L"),
+            # Keycode.Green:  (xdo, "click", Button.WheelUp),
+            # Keycode.Blue:   (xdo, "click", Button.WheelDown),
+        },
+    })
     client.connect()
     print("Ready")
-    signal.pause()
+
+    clock = Clock()
+    while True:
+        timeout = timestep if cursor.active else None
+        events = client.recv(timeout)
+        time_delta = clock()
+        cursor.dispatch(time_delta * mouse_speed)
+        for event in events:
+            client.dispatch(*event)
 
 
 class Client:
@@ -125,6 +219,7 @@ class Client:
         self.num_modes = num_modes
         self.mode = 0
         self.bind({(Keycode.Yellow, Event.KeyDown): [self.switch_mode]})
+        self.events = Queue()
 
     def bind(self, rules):
         self.keybindings.extend(make_keybindings((), rules))
@@ -140,6 +235,18 @@ class Client:
         cec.add_callback(self.on_keypress, cec.EVENT_KEYPRESS)
 
     def on_keypress(self, event, keycode, duration):
+        self.events.put((event, keycode, duration))
+
+    def recv(self, timeout):
+        events = []
+        try:
+            events.append(self.events.get(timeout=timeout))
+            while True:
+                events.append(self.events.get_nowait())
+        except Empty:
+            return events
+
+    def dispatch(self, event, keycode, duration):
         mode = self.mode
         event = (Event.KeyDown if duration == 0 else Event.KeyUp).value
         for on, action in self.keybindings:
