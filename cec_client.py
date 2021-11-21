@@ -43,16 +43,27 @@ def Xdo(*args):
 
 
 KEYBINDINGS = {
-    (Mode.Keyboard, Event.KeyUp): {
-        Keycode.Up:     Xdo("key", "Up"),
-        Keycode.Down:   Xdo("key", "Down"),
-        Keycode.Left:   Xdo("key", "Left"),
-        Keycode.Right:  Xdo("key", "Right"),
-        Keycode.Ok:     Xdo("key", "Return"),
-        Keycode.Back:   Xdo("key", "Escape"),
-        Keycode.Red:    Xdo("key", "Super_L"),
+    (Mode.Keyboard, Event.KeyDown): {
+        Keycode.Up:     Xdo("keydown", "Up"),
+        Keycode.Down:   Xdo("keydown", "Down"),
+        Keycode.Left:   Xdo("keydown", "Left"),
+        Keycode.Right:  Xdo("keydown", "Right"),
+        Keycode.Ok:     Xdo("keydown", "Return"),
+        Keycode.Back:   Xdo("keydown", "Escape"),
+        Keycode.Red:    Xdo("keydown", "Super_L"),
         Keycode.Green:  Run("kodi"),
         Keycode.Blue:   Run("chromium-browser"),
+    },
+    (Mode.Keyboard, Event.KeyUp): {
+        Keycode.Up:     Xdo("keyup", "Up"),
+        Keycode.Down:   Xdo("keyup", "Down"),
+        Keycode.Left:   Xdo("keyup", "Left"),
+        Keycode.Right:  Xdo("keyup", "Right"),
+        Keycode.Ok:     Xdo("keyup", "Return"),
+        Keycode.Back:   Xdo("keyup", "Escape"),
+        Keycode.Red:    Xdo("keyup", "Super_L"),
+        # Keycode.Green:  Run("kodi"),
+        # Keycode.Blue:   Run("chromium-browser"),
     },
 }
 
