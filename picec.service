@@ -3,9 +3,7 @@ Description=Cursor control via CEC
 
 [Service]
 Type=simple
-ExecStart=/usr/bin/env picec.py
-Restart=on-failure
-RestartSec=3
+ExecStart=/bin/bash -lc picec.py
 
 [Install]
 WantedBy=default.target
