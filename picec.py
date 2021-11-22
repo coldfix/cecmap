@@ -37,7 +37,7 @@ class Keycode(Enum):
 
 
 def run(*args, **kwargs):
-    return subprocess.Popen(args, **kwargs)
+    return subprocess.Popen(args, preexec_fn=os.setpgrgp, **kwargs)
 
 
 class Condition:
