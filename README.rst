@@ -32,7 +32,11 @@ Usage
 
 Launch::
 
-    picec.py
+    picec
+
+    # or:
+
+    python -m picec
 
 Enable running at startup::
 
