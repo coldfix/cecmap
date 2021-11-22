@@ -8,14 +8,33 @@ raspberry pi.
 Install
 ~~~~~~~
 
-Install from PyPI::
+**as user**
 
-    pip install picec
+::
+
+    pip3 install --user picec
+
+Also, make sure to add ``~/.local/bin`` to your PATH.
+
+
+**as root**
+
+::
+
+    sudo pip3 install picec
 
 
 Usage
 ~~~~~
 
-Simply launch::
+Launch::
 
     picec.py
+
+Enable running at startup::
+
+    systemctl --user enable picec
+
+Start as service::
+
+    systemctl --user start picec

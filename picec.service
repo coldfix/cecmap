@@ -1,0 +1,12 @@
+[Unit]
+Description=Cursor control via CEC
+After=graphical.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/env picec.py
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=graphical.target
