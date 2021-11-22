@@ -1,8 +1,9 @@
 piCEC
 =====
 
-Simple script to control mouse cursor via CEC. Intended for controlling
-raspberry pi.
+Simple script to control mouse cursor via CEC.
+
+Intended for controlling raspberry pi with TV remote.
 
 
 Install
