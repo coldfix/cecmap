@@ -36,7 +36,7 @@ class Keycode(Enum):
     Pause = 70
 
 
-def run(*args, **kwargs):
+def launch(*args, **kwargs):
     return subprocess.Popen(args, preexec_fn=os.setpgrgp, **kwargs)
 
 
@@ -145,8 +145,8 @@ def main():
             Keycode.Pause:  (keyboard.press, Key.media_play_pause),
             Keycode.Back:   (keyboard.press, Key.esc),
             Keycode.Red:    (keyboard.press, Key.cmd),
-            Keycode.Green:  (run, "kodi"),
-            Keycode.Blue:   (run, "chromium-browser"),
+            Keycode.Green:  (launch, "kodi"),
+            Keycode.Blue:   (launch, "chromium-browser"),
         },
         (Mode.Keyboard, Event.KeyUp): {
             Keycode.Up:     (keyboard.release, Key.up),
@@ -158,8 +158,8 @@ def main():
             Keycode.Pause:  (keyboard.release, Key.media_play_pause),
             Keycode.Back:   (keyboard.release, Key.esc),
             Keycode.Red:    (keyboard.release, Key.cmd),
-            # Keycode.Green:  (run, "kodi"),
-            # Keycode.Blue:   (run, "chromium-browser"),
+            # Keycode.Green:  (launch, "kodi"),
+            # Keycode.Blue:   (launch, "chromium-browser"),
         },
         (Mode.Mouse, Event.KeyDown): {
             Keycode.Up:     (cursor.move, Keycode.Up),
