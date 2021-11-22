@@ -1,10 +1,11 @@
 [Unit]
 Description=Cursor control via CEC
-After=graphical.target
 
 [Service]
 Type=simple
 ExecStart=/usr/bin/env picec.py
+Restart=on-failure
+RestartSec=3
 
 [Install]
-WantedBy=graphical.target
+WantedBy=default.target
