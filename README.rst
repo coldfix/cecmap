@@ -9,11 +9,6 @@ Intended for controlling raspberry pi with TV remote.
 Install
 ~~~~~~~
 
-In addition to the picec python script, you will also need xdotool::
-
-    sudo apt install xdotool
-
-
 You can install picec as user or root:
 
 **as user:**

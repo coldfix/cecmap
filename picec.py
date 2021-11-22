@@ -36,20 +36,8 @@ class Keycode(Enum):
     Pause = 70
 
 
-class Button:
-    Left = 1
-    Middle = 2
-    Right = 3
-    WheelUp = 4
-    WheelDown = 5
-
-
 def run(*args, **kwargs):
     return subprocess.Popen(args, **kwargs)
-
-
-def xdo(*args):
-    return run("xdotool", *[str(arg) for arg in args])
 
 
 class Condition:
@@ -70,7 +58,8 @@ class Condition:
 
 class Cursor:
 
-    def __init__(self):
+    def __init__(self, mouse):
+        self.mouse = mouse
         self.active = set()
         self.dx = {Keycode.Left: -1, Keycode.Right: 1}
         self.dy = {Keycode.Up: -1, Keycode.Down: 1}
@@ -96,7 +85,7 @@ class Cursor:
             self.pos0 = (x2, y2)
             self.pos1 = (x1, y1)
             if x2 != x0 or y2 != y0:
-                xdo("mousemove_relative", "--", x2 - x0, y2 - y0)
+                self.mouse.move(x2 - x0, y2 - y0)
 
 
 def make_condition(on):
@@ -135,36 +124,40 @@ class Clock:
 def main():
     print("Initializing...")
     os.environ.setdefault('DISPLAY', ':0')
+    from pynput.mouse import Controller as Mouse, Button
+    from pynput.keyboard import Controller as Keyboard, Key
+    mouse = Mouse()
+    keyboard = Keyboard()
 
     timestep = 0.01
     mouse_speed = 200
 
-    cursor = Cursor()
+    cursor = Cursor(mouse)
     client = Client(num_modes=len(Mode.__members__))
     client.bind({
         (Mode.Keyboard, Event.KeyDown): {
-            Keycode.Up:     (xdo, "keydown", "Up"),
-            Keycode.Down:   (xdo, "keydown", "Down"),
-            Keycode.Left:   (xdo, "keydown", "Left"),
-            Keycode.Right:  (xdo, "keydown", "Right"),
-            Keycode.Ok:     (xdo, "keydown", "Return"),
-            Keycode.Play:   (xdo, "keydown", "XF86AudioPlay"),
-            Keycode.Pause:  (xdo, "keydown", "XF86AudioPause"),
-            Keycode.Back:   (xdo, "keydown", "Escape"),
-            Keycode.Red:    (xdo, "keydown", "Super_L"),
+            Keycode.Up:     (keyboard.press, Key.up),
+            Keycode.Down:   (keyboard.press, Key.down),
+            Keycode.Left:   (keyboard.press, Key.left),
+            Keycode.Right:  (keyboard.press, Key.right),
+            Keycode.Ok:     (keyboard.press, Key.enter),
+            Keycode.Play:   (keyboard.press, Key.media_play_pause),
+            Keycode.Pause:  (keyboard.press, Key.media_play_pause),
+            Keycode.Back:   (keyboard.press, Key.esc),
+            Keycode.Red:    (keyboard.press, Key.cmd),
             Keycode.Green:  (run, "kodi"),
             Keycode.Blue:   (run, "chromium-browser"),
         },
         (Mode.Keyboard, Event.KeyUp): {
-            Keycode.Up:     (xdo, "keyup", "Up"),
-            Keycode.Down:   (xdo, "keyup", "Down"),
-            Keycode.Left:   (xdo, "keyup", "Left"),
-            Keycode.Right:  (xdo, "keyup", "Right"),
-            Keycode.Ok:     (xdo, "keyup", "Return"),
-            Keycode.Play:   (xdo, "keyup", "XF86AudioPlay"),
-            Keycode.Pause:  (xdo, "keyup", "XF86AudioPause"),
-            Keycode.Back:   (xdo, "keyup", "Escape"),
-            Keycode.Red:    (xdo, "keyup", "Super_L"),
+            Keycode.Up:     (keyboard.release, Key.up),
+            Keycode.Down:   (keyboard.release, Key.down),
+            Keycode.Left:   (keyboard.release, Key.left),
+            Keycode.Right:  (keyboard.release, Key.right),
+            Keycode.Ok:     (keyboard.release, Key.enter),
+            Keycode.Play:   (keyboard.release, Key.media_play_pause),
+            Keycode.Pause:  (keyboard.release, Key.media_play_pause),
+            Keycode.Back:   (keyboard.release, Key.esc),
+            Keycode.Red:    (keyboard.release, Key.cmd),
             # Keycode.Green:  (run, "kodi"),
             # Keycode.Blue:   (run, "chromium-browser"),
         },
@@ -173,26 +166,26 @@ def main():
             Keycode.Down:   (cursor.move, Keycode.Down),
             Keycode.Left:   (cursor.move, Keycode.Left),
             Keycode.Right:  (cursor.move, Keycode.Right),
-            Keycode.Ok:     (xdo, "mousedown", Button.Left),
-            Keycode.Play:   (xdo, "mousedown", Button.Middle),
-            Keycode.Pause:  (xdo, "mousedown", Button.Right),
-            Keycode.Back:   (xdo, "keydown", "Escape"),
-            Keycode.Red:    (xdo, "keydown", "Super_L"),
-            Keycode.Green:  (xdo, "click", Button.WheelUp),
-            Keycode.Blue:   (xdo, "click", Button.WheelDown),
+            Keycode.Ok:     (mouse.press, Button.left),
+            Keycode.Play:   (mouse.press, Button.middle),
+            Keycode.Pause:  (mouse.press, Button.right),
+            Keycode.Back:   (keyboard.press, Key.esc),
+            Keycode.Red:    (keyboard.press, Key.cmd),
+            Keycode.Green:  (mouse.scroll, 0, +1),
+            Keycode.Blue:   (mouse.scroll, 0, -1),
         },
         (Mode.Mouse, Event.KeyUp): {
             Keycode.Up:     (cursor.stop, Keycode.Up),
             Keycode.Down:   (cursor.stop, Keycode.Down),
             Keycode.Left:   (cursor.stop, Keycode.Left),
             Keycode.Right:  (cursor.stop, Keycode.Right),
-            Keycode.Ok:     (xdo, "mouseup", Button.Left),
-            Keycode.Play:   (xdo, "mouseup", Button.Middle),
-            Keycode.Pause:  (xdo, "mouseup", Button.Right),
-            Keycode.Back:   (xdo, "keyup", "Escape"),
-            Keycode.Red:    (xdo, "keyup", "Super_L"),
-            # Keycode.Green:  (xdo, "click", Button.WheelUp),
-            # Keycode.Blue:   (xdo, "click", Button.WheelDown),
+            Keycode.Ok:     (mouse.release, Button.left),
+            Keycode.Play:   (mouse.release, Button.middle),
+            Keycode.Pause:  (mouse.release, Button.right),
+            Keycode.Back:   (keyboard.release, Key.esc),
+            Keycode.Red:    (keyboard.release, Key.cmd),
+            # Keycode.Green:  (mouse.scroll, 0, +1),
+            # Keycode.Blue:   (mouse.scroll, 0, -1),
         },
     })
     client.connect()
