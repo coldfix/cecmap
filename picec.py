@@ -52,36 +52,6 @@ def xdo(*args):
     return run("xdotool", *[str(arg) for arg in args])
 
 
-KEYBINDINGS = {
-    (Mode.Keyboard, Event.KeyDown): {
-        Keycode.Up:     (xdo, "keydown", "Up"),
-        Keycode.Down:   (xdo, "keydown", "Down"),
-        Keycode.Left:   (xdo, "keydown", "Left"),
-        Keycode.Right:  (xdo, "keydown", "Right"),
-        Keycode.Ok:     (xdo, "keydown", "Return"),
-        Keycode.Play:   (xdo, "keydown", "XF86AudioPlay"),
-        Keycode.Pause:  (xdo, "keydown", "XF86AudioPause"),
-        Keycode.Back:   (xdo, "keydown", "Escape"),
-        Keycode.Red:    (xdo, "keydown", "Super_L"),
-        Keycode.Green:  (run, "kodi"),
-        Keycode.Blue:   (run, "chromium-browser"),
-    },
-    (Mode.Keyboard, Event.KeyUp): {
-        Keycode.Up:     (xdo, "keyup", "Up"),
-        Keycode.Down:   (xdo, "keyup", "Down"),
-        Keycode.Left:   (xdo, "keyup", "Left"),
-        Keycode.Right:  (xdo, "keyup", "Right"),
-        Keycode.Ok:     (xdo, "keyup", "Return"),
-        Keycode.Play:   (xdo, "keyup", "XF86AudioPlay"),
-        Keycode.Pause:  (xdo, "keyup", "XF86AudioPause"),
-        Keycode.Back:   (xdo, "keyup", "Escape"),
-        Keycode.Red:    (xdo, "keyup", "Super_L"),
-        # Keycode.Green:  (run, "kodi"),
-        # Keycode.Blue:   (run, "chromium-browser"),
-    },
-}
-
-
 class Condition:
 
     def __init__(self, **attrs):
@@ -171,8 +141,33 @@ def main():
 
     cursor = Cursor()
     client = Client(num_modes=len(Mode.__members__))
-    client.bind(KEYBINDINGS)
     client.bind({
+        (Mode.Keyboard, Event.KeyDown): {
+            Keycode.Up:     (xdo, "keydown", "Up"),
+            Keycode.Down:   (xdo, "keydown", "Down"),
+            Keycode.Left:   (xdo, "keydown", "Left"),
+            Keycode.Right:  (xdo, "keydown", "Right"),
+            Keycode.Ok:     (xdo, "keydown", "Return"),
+            Keycode.Play:   (xdo, "keydown", "XF86AudioPlay"),
+            Keycode.Pause:  (xdo, "keydown", "XF86AudioPause"),
+            Keycode.Back:   (xdo, "keydown", "Escape"),
+            Keycode.Red:    (xdo, "keydown", "Super_L"),
+            Keycode.Green:  (run, "kodi"),
+            Keycode.Blue:   (run, "chromium-browser"),
+        },
+        (Mode.Keyboard, Event.KeyUp): {
+            Keycode.Up:     (xdo, "keyup", "Up"),
+            Keycode.Down:   (xdo, "keyup", "Down"),
+            Keycode.Left:   (xdo, "keyup", "Left"),
+            Keycode.Right:  (xdo, "keyup", "Right"),
+            Keycode.Ok:     (xdo, "keyup", "Return"),
+            Keycode.Play:   (xdo, "keyup", "XF86AudioPlay"),
+            Keycode.Pause:  (xdo, "keyup", "XF86AudioPause"),
+            Keycode.Back:   (xdo, "keyup", "Escape"),
+            Keycode.Red:    (xdo, "keyup", "Super_L"),
+            # Keycode.Green:  (run, "kodi"),
+            # Keycode.Blue:   (run, "chromium-browser"),
+        },
         (Mode.Mouse, Event.KeyDown): {
             Keycode.Up:     (cursor.move, Keycode.Up),
             Keycode.Down:   (cursor.move, Keycode.Down),
