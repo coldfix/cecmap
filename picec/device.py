@@ -28,6 +28,10 @@ class Mouse(Device):
         self.pos0 = (0, 0)
         self.pos1 = self.pos0
 
+    @property
+    def button(self):
+        return (self.press, self.release)
+
     def press(self, button):
         self.controller.press(button)
 
@@ -36,6 +40,10 @@ class Mouse(Device):
 
     def scroll(self, dx, dy):
         self.controller.scroll(dx, dy)
+
+    @property
+    def motion(self):
+        return (self.start_motion, self.stop_motion)
 
     def start_motion(self, key):
         self.active.add(key)
@@ -62,6 +70,10 @@ class Keyboard(Device):
 
     def __init__(self):
         self.controller = KeyboardController()
+
+    @property
+    def key(self):
+        return (self.press, self.release)
 
     def press(self, key):
         self.controller.press(key)

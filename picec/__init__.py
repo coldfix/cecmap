@@ -5,55 +5,20 @@ import argparse
 import os
 import subprocess
 import time
-from enum import Enum
 from importlib import import_module
 from queue import Queue, Empty
-
-
-class Event(Enum):
-    KeyDown = 0
-    KeyUp = 1
 
 
 def launch(*args, **kwargs):
     return subprocess.Popen(args, preexec_fn=os.setpgrgp, **kwargs)
 
 
-class Condition:
-
-    def __init__(self, **attrs):
-        self.attrs = attrs
-
-    def __and__(self, other):
-        return Condition(**{**self.attrs, **other.attrs})
-
-    def check(self, **attrs):
-        return all([
-            self.attrs[key] == val
-            for key, val in attrs.items()
-            if key in self.attrs
-        ])
-
-
-def make_condition(on):
-    if not isinstance(on, (tuple, list)):
-        on = [on]
-    return Condition(**{
-        x.__class__.__name__.lower(): x.value
-        for x in on
-    })
-
-
-def make_keybindings(on, action):
-    cond = make_condition(on)
-    if isinstance(action, dict):
-        return [
-            (cond & x_cond, x_do)
-            for x in action.items()
-            for x_cond, x_do in make_keybindings(*x)
-        ]
+def make_handler(handler):
+    func, *args = handler
+    if isinstance(func, (list, tuple)):
+        return handler
     else:
-        return [(cond, action)]
+        return ((func, None), *args)
 
 
 class Clock:
@@ -99,9 +64,8 @@ def parse_args(args):
 
 class Client:
 
-    def __init__(self, *, num_modes=2):
-        self.keybindings = []
-        self.num_modes = num_modes
+    def __init__(self):
+        self.keybindings = {}
         self.mode = 0
         self.events = Queue()
         self.devices = []
@@ -110,14 +74,14 @@ class Client:
         self.devices.append(device)
 
     def bind(self, rules):
-        self.keybindings.extend(make_keybindings((), rules))
+        for mode, bindings in rules.items():
+            self.keybindings.setdefault(mode, {}).update({
+                key: make_handler(handler)
+                for key, handler in bindings.items()
+            })
 
-    def switch_mode(self, mode=None):
-        if mode is None:
-            mode = self.mode + 1
-        else:
-            mode = getattr(mode, 'value', mode)
-        self.mode = mode % self.num_modes
+    def set_mode(self, mode):
+        self.mode = mode
 
     def connect(self):
         cec.init()
@@ -137,13 +101,13 @@ class Client:
             return events
 
     def dispatch(self, event, keycode, duration):
-        mode = self.mode
-        event = (Event.KeyDown if duration == 0 else Event.KeyUp).value
-        for on, action in self.keybindings:
-            if on.check(keycode=keycode, mode=mode, event=event):
-                func, *args = action
+        default = self.keybindings.get(any, {}).get(keycode)
+        handler = self.keybindings.get(self.mode, {}).get(keycode, default)
+        if handler:
+            funcs, *args = handler
+            func = funcs[duration > 0]
+            if func:
                 func(*args)
-                break
 
 
 if __name__ == '__main__':
