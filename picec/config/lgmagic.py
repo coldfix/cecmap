@@ -2,7 +2,7 @@
 2-mode configuration for LG with MagicRemote.
 """
 
-from picec import launch
+from picec import launch, StartStop
 from picec.device import Key, Button, Keyboard, Mouse
 
 
@@ -61,7 +61,7 @@ def setup(client):
             Keycode.Play:   (mouse.button, Button.middle),
             Keycode.Pause:  (mouse.button, Button.right),
             Keycode.Back:   (keyboard.key, Key.esc),
-            Keycode.Red:    (keyboard.key, Key.cmd),
+            Keycode.Red:    (StartStop("matchbox-keyboard"), ),
             Keycode.Green:  (mouse.scroll, 0, +1),
             Keycode.Blue:   (mouse.scroll, 0, -1),
             Keycode.Yellow: (client.set_mode, Mode.Keyboard),

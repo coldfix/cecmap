@@ -14,6 +14,20 @@ def launch(*args, **kwargs):
     return subprocess.Popen(args, preexec_fn=os.setpgrgp, **kwargs)
 
 
+class StartStop:
+
+    def __init__(self, *argv):
+        self.argv = argv
+        self.proc = None
+
+    def __call__(self):
+        if self.proc is None:
+            self.proc = launch(*self.argv)
+        else:
+            self.proc.terminate()
+            self.proc = None
+
+
 def make_handler(handler):
     func, *args = handler
     if isinstance(func, (list, tuple)):
