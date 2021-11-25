@@ -1,9 +1,28 @@
 Changes
 -------
 
+v0.0.3
+~~~~~~
+Date: 25.11.2021
+
+- spawn subprocesses in new process group
+  (to avoid tearing them down with us when we are stopped)
+- execute via ``bash -l`` in .service file to ensure PATH customizations are
+  available. This may fix an error when autostarting the service, and will
+  be useful for launching locally installed applications.
+- move code to package structure
+- use entrypoint for creating the executable
+- rename executable from ``picec.py`` to ``picec``
+- add command line option to change config
+  (undocumented so far, and the API will change!)
+- load config from ``~/.config/picec/config.py`` if exists
+- simplify config
+- bind ``matchbox-keyboard`` to red button in mouse mode
+- add notification about mode changes using notify2
+
+
 v0.0.2
 ~~~~~~
-
 Date: 22.11.2021
 
 - replace xdotool by ``pynput``
@@ -12,7 +31,6 @@ Date: 22.11.2021
 
 v0.0.1
 ~~~~~~
-
 Date: 22.11.2021
 
 Initial prototype:
