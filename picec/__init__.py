@@ -2,10 +2,11 @@
 import cec
 
 import argparse
+import importlib
 import os
+import runpy
 import subprocess
 import time
-from importlib import import_module
 from queue import Queue, Empty
 
 
@@ -39,7 +40,24 @@ def main(args=None):
     timestep = 0.01
     client = Client()
     print("Loading config...")
-    config = import_module('picec.config.' + args.config)
+
+    config_file = args.config
+    if config_file is None:
+        config_home = (
+            os.environ.get('XDG_CONFIG_HOME') or
+            os.path.expanduser('~/.config'))
+        if os.path.exists(os.path.join(config_home, "picec/config.py")):
+            config_file = os.path.join(config_home, "picec/config.py")
+        else:
+            config_file = "lgmagic"
+
+    if os.path.isfile(config_file):
+        config = runpy.run_path(config_file)
+    elif importlib.util.find_spec('picec.config.' + config_file):
+        config = runpy.run_module('picec.config.' + config_file)
+    else:
+        config = runpy.run_module(config_file)
+
     config.setup(client)
     print("Initializing...")
     client.connect()
@@ -58,7 +76,7 @@ def main(args=None):
 
 def parse_args(args):
     parser = argparse.ArgumentParser()
-    parser.add_argument('-c', '--config', default='lgmagic')
+    parser.add_argument('-c', '--config', default=None)
     return parser.parse_args(args)
 
 
