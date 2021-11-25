@@ -26,6 +26,11 @@ Also, make sure to add ``~/.local/bin`` to your PATH.
 
     sudo pip3 install picec
 
+In order to see notifications when switching modes, it's also necessary to
+have a notification daemon installed. I recommend ``xfce4-notifyd``::
+
+    sudo apt install xfce4-notifyd
+
 
 Usage
 ~~~~~

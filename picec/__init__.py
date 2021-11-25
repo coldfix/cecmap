@@ -9,6 +9,8 @@ import subprocess
 import time
 from queue import Queue, Empty
 
+from picec.notify import Notify
+
 
 def launch(*args, **kwargs):
     return subprocess.Popen(args, preexec_fn=os.setpgrgp, **kwargs)
@@ -101,6 +103,7 @@ class Client:
         self.mode = 0
         self.events = Queue()
         self.devices = []
+        self.notify = Notify()
 
     def add_device(self, device):
         self.devices.append(device)
@@ -114,6 +117,7 @@ class Client:
 
     def set_mode(self, mode):
         self.mode = mode
+        self.notify("Mode: {}".format(mode))
 
     def connect(self):
         cec.init()
