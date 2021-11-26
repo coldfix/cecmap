@@ -51,7 +51,6 @@ class Clock:
 
 def main(args=None):
     args = parse_args(args)
-    os.environ.setdefault('DISPLAY', ':0')
     timestep = 0.01
     client = Client()
     print("Loading config...")
