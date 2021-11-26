@@ -169,3 +169,15 @@ config file.
 
 In the future, I hope to add a more user-friendly way to configure keycodes
 without having to edit a config file manually.
+
+
+Reloading
+~~~~~~~~~
+
+picec can be told to reload the config by sending ``SIGUSR1``, e.g.::
+
+    pkill -USR1 picec
+
+or, if started as a service::
+
+    systemctl --user reload picec
