@@ -13,7 +13,7 @@ from picec.notify import Notify
 
 
 def launch(*args, **kwargs):
-    return subprocess.Popen(args, preexec_fn=os.setpgrgp, **kwargs)
+    return subprocess.Popen(args, preexec_fn=os.setpgrp, **kwargs)
 
 
 class StartStop:
@@ -74,7 +74,7 @@ def main(args=None):
     else:
         config = runpy.run_module(config_file)
 
-    config.setup(client)
+    config['setup'](client)
     print("Initializing...")
     client.connect()
     print("Ready")
@@ -103,7 +103,7 @@ class Client:
         self.mode = 0
         self.events = Queue()
         self.devices = []
-        self.notify = Notify()
+        self.notify = Notify("picec")
 
     def add_device(self, device):
         self.devices.append(device)
