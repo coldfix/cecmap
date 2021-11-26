@@ -120,28 +120,36 @@ Commands
 Currently, the following commands are supported as right hand sides of
 keybindings:
 
-``launch <command> [<args>...]``: Start the given program. You can use
-shell-like quoting to pass arguments with spaces in them.
+.. list-table:: Commands
 
-``toggle <command> [<args>...]``: Start the given program with command
-line options. If we have previously started the program, terminate it. Useful
-for commands such as ``matchbox-keyboard``.
+    * - ``launch <command> [<args>...]``
+      - Start the given program. You can use shell-like quoting to pass
+        arguments with spaces in them.
 
-``key <name>|<keycode>|@<letter>``: Type the specified key. For a list of
-key names, see Key_.
+    * - ``toggle <command> [<args>...]``
+      - Start the given program with command line options. If we have
+        previously started the program, terminate it. Useful for commands such
+        as ``matchbox-keyboard``.
 
-``button left|middle|right|<number>``: Perform a mouse click using the
-specified button. More button names are available, see Button_.
+    * - ``key <name>|<keycode>|@<letter>``
+      - Type the specified key. For a list of key names, see Key_.
 
-``scroll up|down|left|right [<ticks>]``: Scroll the mouse wheel in the
-specified direction a specified number of scroll ticks (default = 1).
+    * - ``button left|middle|right|<number>``
+      - Perform a mouse click using the specified button. More button names
+        are available, see Button_.
 
-``motion up|down|left|right``: Perform a mouse cursor motion along the
-given direction while the key is pressed.
+    * - ``scroll up|down|left|right [<ticks>]``
+      - Scroll the mouse wheel in the specified direction a specified number
+        of scroll ticks (default = 1).
 
-``switch [<mode>]``: Switch to the specified ``<mode>``, or if this
-optional argument is omitted, cycle through modes in the order of their
-appearance in the config files.
+    * - ``motion up|down|left|right``
+      - Perform a mouse cursor motion along the given direction while the key
+        is pressed.
+
+    * - ``switch [<mode>]``
+      - Switch to the specified ``<mode>``, or if this optional argument is
+        omitted, cycle through modes in the order of their appearance in the
+        config files.
 
 .. _Key: https://pynput.readthedocs.io/en/latest/keyboard.html#pynput.keyboard.Key
 .. _Button: https://github.com/moses-palmer/pynput/blob/master/lib/pynput/mouse/_xorg.py
