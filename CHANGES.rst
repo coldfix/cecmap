@@ -1,6 +1,15 @@
 Changes
 -------
 
+v0.0.4
+~~~~~~
+Date: 26.11.2021
+
+- fix: TypeError: __init__() missing 1 required positional argument: 'app_name'
+- fix: AttributeError: 'dict' object has no attribute 'setup'
+- fix: AttributeError: module 'os' has no attribute 'setpgrgp'
+
+
 v0.0.3
 ~~~~~~
 Date: 25.11.2021
