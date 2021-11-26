@@ -1,40 +1,14 @@
 import cec
 
 import argparse
-import importlib
 import os
-import runpy
-import subprocess
 import time
+from importlib.resources import is_resource, read_text
 from queue import Queue, Empty
 
+from picec.config import Config
+from picec.device import Keyboard, Mouse
 from picec.notify import Notify
-
-
-def launch(*args, **kwargs):
-    return subprocess.Popen(args, preexec_fn=os.setpgrp, **kwargs)
-
-
-class StartStop:
-
-    def __init__(self, *argv):
-        self.argv = argv
-        self.proc = None
-
-    def __call__(self):
-        if self.proc is None:
-            self.proc = launch(*self.argv)
-        else:
-            self.proc.terminate()
-            self.proc = None
-
-
-def make_handler(handler):
-    func, *args = handler
-    if isinstance(func, (list, tuple)):
-        return handler
-    else:
-        return ((func, None), *args)
 
 
 class Clock:
@@ -53,26 +27,28 @@ def main(args=None):
     args = parse_args(args)
     timestep = 0.01
     client = Client()
-    print("Loading config...")
 
     config_file = args.config
     if config_file is None:
         config_home = (
             os.environ.get('XDG_CONFIG_HOME') or
             os.path.expanduser('~/.config'))
-        if os.path.exists(os.path.join(config_home, "picec/config.py")):
-            config_file = os.path.join(config_home, "picec/config.py")
+        if os.path.exists(os.path.join(config_home, "picec.cfg")):
+            config_file = os.path.join(config_home, "picec.cfg")
+        elif os.path.exists('/etc/picec.cfg'):
+            config_file = '/etc/picec.cfg'
         else:
-            config_file = "lgmagic"
+            config_file = 'lgmagic'
 
-    if os.path.isfile(config_file):
-        config = runpy.run_path(config_file)
-    elif importlib.util.find_spec('picec.config.' + config_file):
-        config = runpy.run_module('picec.config.' + config_file)
+    print("Loading config file:", config_file)
+    resource = ('picec.config', config_file + '.cfg')
+    if '/' not in config_file and is_resource(*resource):
+        text = read_text(*resource)
     else:
-        config = runpy.run_module(config_file)
+        with open(config_file) as f:
+            text = f.read()
+    client.reset(client.config.load_string(text, client))
 
-    config['setup'](client)
     print("Initializing...")
     client.connect()
     print("Ready")
@@ -97,25 +73,27 @@ def parse_args(args):
 class Client:
 
     def __init__(self):
-        self.keybindings = {}
-        self.mode = 0
+        self.config = Config()
+        self.mode = None
         self.events = Queue()
-        self.devices = []
+        self.mouse = Mouse()
+        self.keyboard = Keyboard()
+        self.devices = [self.mouse, self.keyboard]
         self.notify = Notify("picec", timeout=3000)
 
-    def add_device(self, device):
-        self.devices.append(device)
+    def reset(self, config):
+        self.config = config
+        if self.mode not in config.modes:
+            self.mode = config.mode
 
-    def bind(self, rules):
-        for mode, bindings in rules.items():
-            self.keybindings.setdefault(mode, {}).update({
-                key: make_handler(handler)
-                for key, handler in bindings.items()
-            })
-
-    def set_mode(self, mode):
-        self.mode = mode
-        self.notify("Mode: {}".format(mode))
+    def switch(self, mode=None):
+        """Switch to the given or the next mode."""
+        if mode is None:
+            current = self.config.modes.index(self.mode)
+            mode = self.config.modes[(current + 1) % len(self.config.modes)]
+        if self.mode != mode:
+            self.mode = mode
+            self.notify("Mode: {}".format(mode))
 
     def connect(self):
         cec.init()
@@ -135,13 +113,9 @@ class Client:
             return events
 
     def dispatch(self, event, keycode, duration):
-        default = self.keybindings.get(any, {}).get(keycode)
-        handler = self.keybindings.get(self.mode, {}).get(keycode, default)
+        handler = self.config.keybinding(self.mode, keycode)
         if handler:
-            funcs, *args = handler
-            func = funcs[duration > 0]
-            if func:
-                func(*args)
+            handler(duration)
 
 
 if __name__ == '__main__':
