@@ -103,7 +103,7 @@ class Client:
         self.mode = 0
         self.events = Queue()
         self.devices = []
-        self.notify = Notify("picec")
+        self.notify = Notify("picec", timeout=3000)
 
     def add_device(self, device):
         self.devices.append(device)
