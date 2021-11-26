@@ -49,7 +49,7 @@ class Mouse(Device):
         self.active.add(key)
 
     def stop_motion(self, key):
-        self.active.remove(key)
+        self.active.discard(key)
 
     def dispatch(self, delta):
         dx = sum([self.dx.get(key, 0) for key in self.active])
