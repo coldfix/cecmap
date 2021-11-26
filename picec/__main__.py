@@ -1,2 +1,2 @@
-from picec import main
+from picec.cli import main
 main()
