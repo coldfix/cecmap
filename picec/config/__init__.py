@@ -1,5 +1,4 @@
 import shlex
-from configparser import ConfigParser
 
 from picec.commands import Command
 
@@ -29,23 +28,15 @@ class Config:
         handler = self.bindings[mode].get(keycode, default)
         return handler
 
-    def load_file(self, filename, client):
-        with open(filename) as f:
-            text = f.read()
-        return self.load_string(text, client)
-
-    def load_string(self, text, client):
+    def load(self, parser, client):
         """
-        Load keycodes and keybindings from config file.
+        Load keycodes and keybindings from config parser.
 
         Returns a new ``Config`` object that is a copy of this config merged
         with the loaded settings.
 
         See the ``picec/config/lgmagic.cfg`` file for example.
         """
-        parser = ConfigParser()
-        parser.read_string(text)
-
         keycodes = self.keycodes.copy()
         modes = {}
 

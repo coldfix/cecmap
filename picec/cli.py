@@ -4,6 +4,7 @@ import argparse
 import os
 import signal
 import time
+from configparser import ConfigParser
 from importlib.resources import is_resource, read_text
 from queue import Queue, Empty
 
@@ -24,35 +25,39 @@ class Clock:
         return delta
 
 
-def reload(client, config_file):
+def reload(client, *config_files):
     """Reload config."""
-    if config_file is None:
+    if not config_files:
         config_home = (
             os.environ.get('XDG_CONFIG_HOME') or
             os.path.expanduser('~/.config'))
         if os.path.exists(os.path.join(config_home, "picec.cfg")):
-            config_file = os.path.join(config_home, "picec.cfg")
+            config_files = [os.path.join(config_home, "picec.cfg")]
         elif os.path.exists('/etc/picec.cfg'):
-            config_file = '/etc/picec.cfg'
+            config_files = ['/etc/picec.cfg']
         else:
-            config_file = 'lgmagic'
+            config_files = ['lgmagic']
 
-    print("Loading config file:", config_file)
-    resource = ('picec.config', config_file + '.cfg')
-    if '/' not in config_file and is_resource(*resource):
-        text = read_text(*resource)
-    else:
-        with open(config_file) as f:
-            text = f.read()
-    client.reset(client.config.load_string(text, client))
+    parser = ConfigParser()
+    for config_file in config_files:
+        print("Loading config file:", config_file)
+        resource = ('picec.config', config_file + '.cfg')
+        if '/' not in config_file and is_resource(*resource):
+            text = read_text(*resource)
+        else:
+            with open(config_file) as f:
+                text = f.read()
+        parser.read_string(text)
+
+    client.reset(Config().load(parser, client))
 
 
 def main(args=None):
     args = parse_args(args)
     timestep = 0.01
     client = Client()
-    signal.signal(signal.SIGUSR1, lambda *_: reload(client, args.config))
-    reload(client, args.config)
+    signal.signal(signal.SIGUSR1, lambda *_: reload(client, *args.config))
+    reload(client, *args.config)
 
     print("Initializing...")
     client.connect()
@@ -71,7 +76,7 @@ def main(args=None):
 
 def parse_args(args):
     parser = argparse.ArgumentParser()
-    parser.add_argument('-c', '--config', default=None)
+    parser.add_argument('-c', '--config', default=[], action='append')
     return parser.parse_args(args)
 
 
