@@ -50,7 +50,7 @@ class Command:
     @classmethod
     def toggle(cls, client, *argv):
         """Start/stop an application."""
-        return cls("toggle", toggle(*argv), None)
+        return cls("toggle", toggle, None, *argv)
 
     @classmethod
     def key(cls, client, name):
@@ -124,17 +124,14 @@ def launch(*args, **kwargs):
     return subprocess.Popen(args, preexec_fn=os.setpgrp, **kwargs)
 
 
-class toggle:
+# Keep global score of started processes, so that toggles defined in different
+# modes always refer to the same process:
+_procs = {}
 
+
+def toggle(*args, **kwargs):
     """Start process. If already running, terminate."""
-
-    def __init__(self, *argv):
-        self.argv = argv
-        self.proc = None
-
-    def __call__(self):
-        if self.proc is None:
-            self.proc = launch(*self.argv)
-        else:
-            self.proc.terminate()
-            self.proc = None
+    if args in _procs:
+        _procs.pop(args).terminate()
+    else:
+        _procs[args] = launch(*args, **kwargs)
