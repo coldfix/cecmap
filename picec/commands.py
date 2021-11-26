@@ -2,7 +2,7 @@ import os
 import subprocess
 
 from pynput.mouse import Button
-from pynput.keyboard import Key
+from pynput.keyboard import Key, KeyCode
 
 
 SCROLL_DIR = {
@@ -18,6 +18,11 @@ MOTION_DIR = {
     'left': Key.left,
     'right': Key.right,
 }
+
+
+class _Button:
+    def __init__(self, button):
+        self.value = button
 
 
 class Command:
@@ -55,18 +60,26 @@ class Command:
     @classmethod
     def key(cls, client, name):
         """Type a keyboard key, see ``pynput.keyboard.Key`` for valid keys."""
-        if not is_public(Key, name):
+        if name.isnumeric():
+            key = KeyCode.from_vk(int(name))
+        elif name.startswith('@') and len(name) == 2:
+            key = KeyCode.from_char(name[1])
+        elif is_public(Key, name):
+            key = getattr(Key, name)
+        else:
             raise ValueError("Invalid key name: {!r}".format(name))
-        key = getattr(Key, name)
         kbd = client.keyboard
         return cls("key", kbd.press, kbd.release, key)
 
     @classmethod
     def button(cls, client, name):
         """Click a mouse button (left/middle/right)."""
-        if not is_public(Button, name):
+        if name.isnumeric():
+            button = _Button(int(name))
+        elif is_public(Button, name):
+            button = getattr(Button, name)
+        else:
             raise ValueError("Invalid button name: {!r}".format(name))
-        button = getattr(Button, name)
         mouse = client.mouse
         return cls("button", mouse.press, mouse.release, button)
 

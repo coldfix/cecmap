@@ -127,10 +127,11 @@ shell-like quoting to pass arguments with spaces in them.
 line options. If we have previously started the program, terminate it. Useful
 for commands such as ``matchbox-keyboard``.
 
-``key <name>``: Type the specified key. For a list of key names, see Key_.
+``key <name>|<keycode>|@<letter>``: Type the specified key. For a list of
+key names, see Key_.
 
-``button left|middle|right``: Perform a mouse click using the specified
-button. More button names are available, see Button_.
+``button left|middle|right|<number>``: Perform a mouse click using the
+specified button. More button names are available, see Button_.
 
 ``scroll up|down|left|right [<ticks>]``: Scroll the mouse wheel in the
 specified direction a specified number of scroll ticks (default = 1).
