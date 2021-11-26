@@ -2,6 +2,7 @@ import cec
 
 import argparse
 import os
+import signal
 import time
 from importlib.resources import is_resource, read_text
 from queue import Queue, Empty
@@ -23,12 +24,8 @@ class Clock:
         return delta
 
 
-def main(args=None):
-    args = parse_args(args)
-    timestep = 0.01
-    client = Client()
-
-    config_file = args.config
+def reload(client, config_file):
+    """Reload config."""
     if config_file is None:
         config_home = (
             os.environ.get('XDG_CONFIG_HOME') or
@@ -48,6 +45,14 @@ def main(args=None):
         with open(config_file) as f:
             text = f.read()
     client.reset(client.config.load_string(text, client))
+
+
+def main(args=None):
+    args = parse_args(args)
+    timestep = 0.01
+    client = Client()
+    signal.signal(signal.SIGUSR1, lambda *_: reload(client, args.config))
+    reload(client, args.config)
 
     print("Initializing...")
     client.connect()
