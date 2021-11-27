@@ -2,7 +2,7 @@
 2-mode configuration for LG with MagicRemote.
 """
 
-from picec import launch, StartStop
+from picec.cli import launch, StartStop
 from picec.device import Key, Button, Keyboard, Mouse
 
 
