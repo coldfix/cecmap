@@ -1,6 +1,21 @@
 Changes
 -------
 
+v0.0.5
+~~~~~~
+Date: 27.11.2021
+
+- fix KeyError if a motion-bound key was already pressed before starting
+  picec but released afterwards
+- set/decrease notification timeout to 3s
+- move code to picec.cli submodule
+- remove ability to load .py config files
+- add ability to load .cfg config files
+- add ability to reload config on the fly using SIGUSR1
+- add ability to merge config from multiple .cfg files
+- document config format
+
+
 v0.0.4
 ~~~~~~
 Date: 26.11.2021
