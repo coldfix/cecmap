@@ -162,7 +162,7 @@ In order to use this program, you will have to configure the keycodes specific
 to your TV and remote control. In order to determine which key corresponds to
 which keycode, open a terminal and execute::
 
-    cec-client -l
+    cec-client
 
 Watch the output as you press buttons, and write down the keycodes for the
 config file.
