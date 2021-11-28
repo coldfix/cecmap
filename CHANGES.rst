@@ -1,6 +1,15 @@
 Changes
 -------
 
+v1.0.0
+~~~~~~
+Date: 28.11.2021
+
+- rename to cecmap
+- switch default keybindings for F1 (blue) and F4 (yellow)
+- add keycodes for all user control codes defined by CEC
+
+
 v0.0.5
 ~~~~~~
 Date: 27.11.2021
