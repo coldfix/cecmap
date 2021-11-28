@@ -1,12 +1,13 @@
 import shlex
 
 from picec.commands import Command
+from picec.keycodes import KEYCODES
 
 
 class Config:
 
-    def __init__(self):
-        self.keycodes = {}
+    def __init__(self, keycodes=KEYCODES):
+        self.keycodes = keycodes.copy()
         self.bindings = {'*': {}}
         self.mode = None
         self.modes = []
@@ -35,7 +36,7 @@ class Config:
         Returns a new ``Config`` object that is a copy of this config merged
         with the loaded settings.
 
-        See the ``picec/config/lgmagic.cfg`` file for example.
+        See the ``picec/config/default.cfg`` file for example.
         """
         keycodes = self.keycodes.copy()
         modes = {}

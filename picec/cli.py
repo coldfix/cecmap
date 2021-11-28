@@ -36,7 +36,7 @@ def reload(client, *config_files):
         elif os.path.exists('/etc/picec.cfg'):
             config_files = ['/etc/picec.cfg']
         else:
-            config_files = ['lgmagic']
+            config_files = ['default']
 
     parser = ConfigParser()
     for config_file in config_files:

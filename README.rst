@@ -87,7 +87,7 @@ e.g.:
     yellow = launch kodi
     ...
 
-For a more realistic example, see `picec/config/lgmagic.cfg`_.
+For a more realistic example, see `picec/config/default.cfg`_.
 
 If multiple *modes* are defined, make sure to define a keybinding that
 executes the ``switch`` command. This is most easily done in the special
@@ -109,10 +109,10 @@ and system, or default configuration and uses the first that exists:
 
 - ``$XDG_CONFIG_HOME/picec.cfg`` (defaulting to ``~/.config/picec.cfg``)
 - ``/etc/picec.cfg``
-- `picec/config/lgmagic.cfg`_ (distributed with the package)
+- `picec/config/default.cfg`_ (distributed with the package)
 
 
-.. _picec/config/lgmagic.cfg: https://github.com/coldfix/picec/blob/main/picec/config/lgmagic.cfg
+.. _picec/config/default.cfg: https://github.com/coldfix/picec/blob/main/picec/config/default.cfg
 
 Commands
 ~~~~~~~~
@@ -158,17 +158,14 @@ keybindings:
 Keycodes
 ~~~~~~~~
 
-In order to use this program, you will have to configure the keycodes specific
-to your TV and remote control. In order to determine which key corresponds to
-which keycode, open a terminal and execute::
+If the default keycodes do not work as expected, you can configure the
+keycodes specific to your setting. In order to determine which key corresponds
+to which keycode, open a terminal and execute::
 
     cec-client
 
 Watch the output as you press buttons, and write down the keycodes for the
 config file.
-
-In the future, I hope to add a more user-friendly way to configure keycodes
-without having to edit a config file manually.
 
 
 Reloading
