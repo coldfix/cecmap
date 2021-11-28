@@ -29,6 +29,10 @@ have a notification daemon installed. I recommend ``xfce4-notifyd``::
 
     sudo apt install xfce4-notifyd
 
+I also recommend installing an onscreen keyboard, e.g.::
+
+    sudo apt install matchbox-keyboard
+
 
 Usage
 -----
@@ -54,12 +58,68 @@ Start as service::
     systemctl --user start cecmap
 
 
+Default keybindings
+-------------------
+
+*cecmap* comes configured with default a *Keyboard* and *Mouse* mode to get
+you started (see `cecmap/config/default.cfg`_). You can freely change these
+keybindings and add or override modes using the config format, see
+Configuration_. The default keybindings are as follows:
+
+.. list-table::
+    :header-rows: 1
+
+    * - Key
+      - *Mouse* mode
+      - *Keyboard* mode
+
+    * - 🔵 F1 blue
+      - mouse wheel down
+      - launch ``chromium-browser``
+    * - 🔴 F2 red
+      - launch ``matchbox-keyboard``
+      - ``<Win>``
+    * - 🟢 F3 green
+      - mouse wheel up
+      - launch kodi
+    * - 🟡 F4 yellow
+      - switch mode
+      - switch mode
+
+    * - 🡅 up
+      - move cursor up
+      - ``<up>``
+    * - 🡇 down
+      - move cursor down
+      - ``<down>``
+    * - 🡄 left
+      - move cursor left
+      - ``<left>``
+    * - 🡆 right
+      - move cursor right
+      - ``<right>``
+
+    * - 🆗 select
+      - left click
+      - ``<enter>``
+    * - ▶ play
+      - middle click
+      - ``<media_play_pause>``
+
+    * - ⏸ pause
+      - right click
+      - ``<media_play_pause>``
+    * - ⮨ exit
+      - ``<esc>``
+      - ``<esc>``
+
+
 Configuration
 -------------
 
-*cecmap* uses a simple config format to set keycodes and keybindings. The config
-to be used can be specified on the command line using the ``-c FILE.cfg``
-option. The format is as follows:
+*cecmap* uses a simple config format to set keycodes and keybindings. The
+config to be used can be specified on the command line using the ``-c
+FILE.cfg`` option. The format is as follows:
 
 .. code-block:: cfg
 
