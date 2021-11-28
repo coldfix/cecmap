@@ -74,8 +74,8 @@ Configuration_. The default keybindings are as follows:
       - *Keyboard* mode
 
     * - 🔵 F1 blue
-      - mouse wheel down
-      - launch ``chromium-browser``
+      - switch mode
+      - switch mode
     * - 🔴 F2 red
       - launch ``matchbox-keyboard``
       - ``<Win>``
@@ -83,8 +83,8 @@ Configuration_. The default keybindings are as follows:
       - mouse wheel up
       - launch kodi
     * - 🟡 F4 yellow
-      - switch mode
-      - switch mode
+      - mouse wheel down
+      - launch ``chromium-browser``
 
     * - 🡅 up
       - move cursor up
