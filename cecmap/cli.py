@@ -8,9 +8,9 @@ from configparser import ConfigParser
 from importlib.resources import is_resource, read_text
 from queue import Queue, Empty
 
-from picec.config import Config
-from picec.device import Keyboard, Mouse
-from picec.notify import Notify
+from cecmap.config import Config
+from cecmap.device import Keyboard, Mouse
+from cecmap.notify import Notify
 
 
 class Clock:
@@ -31,17 +31,17 @@ def reload(client, *config_files):
         config_home = (
             os.environ.get('XDG_CONFIG_HOME') or
             os.path.expanduser('~/.config'))
-        if os.path.exists(os.path.join(config_home, "picec.cfg")):
-            config_files = [os.path.join(config_home, "picec.cfg")]
-        elif os.path.exists('/etc/picec.cfg'):
-            config_files = ['/etc/picec.cfg']
+        if os.path.exists(os.path.join(config_home, "cecmap.cfg")):
+            config_files = [os.path.join(config_home, "cecmap.cfg")]
+        elif os.path.exists('/etc/cecmap.cfg'):
+            config_files = ['/etc/cecmap.cfg']
         else:
             config_files = ['default']
 
     parser = ConfigParser()
     for config_file in config_files:
         print("Loading config file:", config_file)
-        resource = ('picec.config', config_file + '.cfg')
+        resource = ('cecmap.config', config_file + '.cfg')
         if '/' not in config_file and is_resource(*resource):
             text = read_text(*resource)
         else:
@@ -89,7 +89,7 @@ class Client:
         self.mouse = Mouse()
         self.keyboard = Keyboard()
         self.devices = [self.mouse, self.keyboard]
-        self.notify = Notify("picec", timeout=3000)
+        self.notify = Notify("cecmap", timeout=3000)
 
     def reset(self, config):
         self.config = config

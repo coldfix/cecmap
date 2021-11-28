@@ -1,7 +1,7 @@
 import shlex
 
-from picec.commands import Command
-from picec.keycodes import KEYCODES
+from cecmap.commands import Command
+from cecmap.keycodes import KEYCODES
 
 
 class Config:
@@ -36,7 +36,7 @@ class Config:
         Returns a new ``Config`` object that is a copy of this config merged
         with the loaded settings.
 
-        See the ``picec/config/default.cfg`` file for example.
+        See the ``cecmap/config/default.cfg`` file for example.
         """
         keycodes = self.keycodes.copy()
         modes = {}

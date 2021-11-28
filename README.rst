@@ -1,21 +1,19 @@
-piCEC
-=====
+cecmap
+======
 
-Simple script to control mouse cursor via CEC.
-
-Intended for controlling raspberry pi with TV remote.
+Maps CEC events to arbitrary keybindings for controlling your raspberrypi desktop via TV remote.
 
 
 Install
 -------
 
-You can install picec as user or root:
+You can install *cecmap* as user or root:
 
 **as user:**
 
 ::
 
-    pip3 install --user picec
+    pip3 install --user cecmap
 
 Also, make sure to add ``~/.local/bin`` to your PATH.
 
@@ -24,7 +22,7 @@ Also, make sure to add ``~/.local/bin`` to your PATH.
 
 ::
 
-    sudo pip3 install picec
+    sudo pip3 install cecmap
 
 In order to see notifications when switching modes, it's also necessary to
 have a notification daemon installed. I recommend ``xfce4-notifyd``::
@@ -37,11 +35,11 @@ Usage
 
 Launch::
 
-    picec
+    cecmap
 
     # or:
 
-    python -m picec
+    python -m cecmap
 
 
 Running as service
@@ -49,17 +47,17 @@ Running as service
 
 Enable running at startup::
 
-    systemctl --user enable picec
+    systemctl --user enable cecmap
 
 Start as service::
 
-    systemctl --user start picec
+    systemctl --user start cecmap
 
 
 Configuration
 -------------
 
-picec uses a simple config format to set keycodes and keybindings. The config
+*cecmap* uses a simple config format to set keycodes and keybindings. The config
 to be used can be specified on the command line using the ``-c FILE.cfg``
 option. The format is as follows:
 
@@ -87,32 +85,32 @@ e.g.:
     yellow = launch kodi
     ...
 
-For a more realistic example, see `picec/config/default.cfg`_.
+For a more realistic example, see `cecmap/config/default.cfg`_.
 
 If multiple *modes* are defined, make sure to define a keybinding that
 executes the ``switch`` command. This is most easily done in the special
 section ``[mode.*]`` that can be used to define fallbacks bindings that apply
-globally to all modes. picec will be started in the topmost declared mode, and
+globally to all modes. *cecmap* will be started in the topmost declared mode, and
 cycle through modes in the order of their appearance.
 
 Multiple config files can be passed. In this case the configuration is merged
 sequentially with later files overriding earlier ones. This can be used to
 e.g. load keycodes and keybindings from different files::
 
-    picec \
+    cecmap \
         -c keycodes.cfg \
         -c mousemode.cfg \
         -c keymode.cfg
 
-If no ``-c CONFIG`` option is passed on the command line, picec checks user
+If no ``-c CONFIG`` option is passed on the command line, *cecmap* checks user
 and system, or default configuration and uses the first that exists:
 
-- ``$XDG_CONFIG_HOME/picec.cfg`` (defaulting to ``~/.config/picec.cfg``)
-- ``/etc/picec.cfg``
-- `picec/config/default.cfg`_ (distributed with the package)
+- ``$XDG_CONFIG_HOME/cecmap.cfg`` (defaulting to ``~/.config/cecmap.cfg``)
+- ``/etc/cecmap.cfg``
+- `cecmap/config/default.cfg`_ (distributed with the package)
 
 
-.. _picec/config/default.cfg: https://github.com/coldfix/picec/blob/main/picec/config/default.cfg
+.. _cecmap/config/default.cfg: https://github.com/coldfix/cecmap/blob/main/cecmap/config/default.cfg
 
 Commands
 ~~~~~~~~
@@ -171,10 +169,10 @@ config file.
 Reloading
 ~~~~~~~~~
 
-picec can be told to reload the config by sending ``SIGUSR1``, e.g.::
+*cecmap* can be told to reload the config by sending ``SIGUSR1``, e.g.::
 
-    pkill -USR1 picec
+    pkill -USR1 cecmap
 
 or, if started as a service::
 
-    systemctl --user reload picec
+    systemctl --user reload cecmap

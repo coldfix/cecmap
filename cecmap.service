@@ -1,9 +1,9 @@
 [Unit]
-Description=Cursor control via CEC
+Description=CEC input mappings
 
 [Service]
 Type=simple
-ExecStart=/bin/bash -lc picec
+ExecStart=/bin/bash -lc cecmap
 ExecReload=/bin/kill -USR1 $MAINPID
 
 [Install]
