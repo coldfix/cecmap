@@ -86,16 +86,16 @@ Configuration_. The default keybindings are as follows:
       - mouse wheel down
       - launch ``chromium-browser``
 
-    * - 🡅 up
+    * - ⬆ up
       - move cursor up
       - ``<up>``
-    * - 🡇 down
+    * - ⬇ down
       - move cursor down
       - ``<down>``
-    * - 🡄 left
+    * - ⬅ left
       - move cursor left
       - ``<left>``
-    * - 🡆 right
+    * - ➡ right
       - move cursor right
       - ``<right>``
 
@@ -109,7 +109,7 @@ Configuration_. The default keybindings are as follows:
     * - ⏸ pause
       - right click
       - ``<media_play_pause>``
-    * - ⮨ exit
+    * - ↩ exit
       - ``<esc>``
       - ``<esc>``
 
